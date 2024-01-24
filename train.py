@@ -9,6 +9,10 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import time
 
+
+# Pickle is used to save and load the model
+import pickle
+
 print(f"import complete {time.time}")
 
 # Define the U-Net model
@@ -49,12 +53,8 @@ print(f"model compiled {time.time}")
 
 # Image recognition
 # Define directories for training, validation, and testing data
-train_image_dir = 'path/to/train/images'
-train_mask_dir = 'path/to/train/masks'
-validation_image_dir = 'path/to/validation/images'
-validation_mask_dir = 'path/to/validation/masks'
-test_image_dir = 'path/to/test/images'
-test_mask_dir = 'path/to/test/masks'
+mask_dir="mask"
+image_dir="image"
 
 # Initialize lists to store data
 train_images = []
@@ -87,17 +87,17 @@ def load_and_preprocess_data(image_dir, mask_dir):
     return np.array(images), np.array(masks)
 
 # Load and preprocess training data
-train_images, train_masks = load_and_preprocess_data(train_image_dir, train_mask_dir)
+train_images, train_masks = load_and_preprocess_data(image_dir, mask_dir)
 
 # Split training data into training and validation sets
 val_split = 0.15  # Adjust the validation split ratio
 train_images, val_images, train_masks, val_masks = train_test_split(train_images, train_masks, test_size=val_split, random_state=42)
 
 # Load and preprocess validation data
-val_images, val_masks = load_and_preprocess_data(validation_image_dir, validation_mask_dir)
+val_images, val_masks = load_and_preprocess_data(image_dir, mask_dir)
 
 # Load and preprocess testing data
-test_images, test_masks = load_and_preprocess_data(test_image_dir, test_mask_dir)
+test_images, test_masks = load_and_preprocess_data(image_dir, mask_dir)
 
 print(f"images processed {time.time}")
 
@@ -110,5 +110,6 @@ model.fit(x=train_images, y=train_masks, validation_data=(val_images, val_masks)
 
 print(f"Training complete {time.time}")
 
-# Save the trained model to a file
-model.save('crop_segmentation_model_1.h5')
+# Save the model to disk
+filename = 'crop.sav'
+pickle.dump(model, open(filename, 'wb'))
